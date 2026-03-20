@@ -47,6 +47,8 @@ jobs:
       # Step 5: Build production bundle to verify compilation succeeds
       - name: Build Production Bundle
         run: npm run build
+        env:
+          VITE_API_URL: http://${{ secrets.EC2_HOST }}:8080
 
       # =============================================
       # SECURITY VULNERABILITY SCANNING PHASE
