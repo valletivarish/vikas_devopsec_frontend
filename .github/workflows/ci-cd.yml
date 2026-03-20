@@ -21,6 +21,8 @@ jobs:
       # Step 1: Checkout source code from the repository
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Step 2: Set up Node.js 18 with npm caching for faster installs
       - name: Set up Node.js 18
@@ -29,24 +31,35 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
+      # =============================================
+      # BUILD AND LINT PHASE
+      # =============================================
+
       # Step 3: Install dependencies using clean install for reproducibility
       - name: Install Dependencies
         run: npm ci
 
       # Step 4: Run ESLint to check code quality and enforce coding standards
-      - name: Run ESLint
+      # ESLint performs static analysis on JavaScript/JSX code to find problematic patterns
+      - name: ESLint Static Code Analysis
         run: npm run lint
 
       # Step 5: Build production bundle to verify compilation succeeds
       - name: Build Production Bundle
         run: npm run build
 
+      # =============================================
+      # SECURITY VULNERABILITY SCANNING PHASE
+      # =============================================
+
       # Step 6: Run npm audit to check for known security vulnerabilities in dependencies
+      # Scans the dependency tree against the npm advisory database for published CVEs
       - name: npm Audit Security Check
         run: npm audit --audit-level=high || true
 
-      # Step 7: Run Trivy filesystem vulnerability scan
-      - name: Trivy Filesystem Scan
+      # Step 7: Run Trivy filesystem vulnerability scan on source code and dependencies
+      # Trivy detects vulnerabilities in OS packages, language-specific packages, and misconfigurations
+      - name: Trivy Filesystem Vulnerability Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
@@ -55,8 +68,9 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM'
         continue-on-error: true
 
-      # Step 8: Generate Trivy SBOM in CycloneDX format
-      - name: Trivy SBOM Generation
+      # Step 8: Generate Trivy SBOM in CycloneDX format for software supply chain transparency
+      # SBOM provides a complete inventory of all components and their versions
+      - name: Trivy SBOM Generation (CycloneDX)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
@@ -65,14 +79,23 @@ jobs:
           output: 'sbom-frontend.json'
         continue-on-error: true
 
-      # Step 9: Run Gitleaks for secret scanning
+      # =============================================
+      # SECRET SCANNING PHASE
+      # =============================================
+
+      # Step 9: Run Gitleaks to scan the git history for accidentally committed secrets
+      # Detects API keys, tokens, passwords, and other sensitive data in the repository history
       - name: Gitleaks Secret Scanning
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      # Step 10: Upload Trivy SBOM
+      # =============================================
+      # ARTIFACT UPLOAD PHASE
+      # =============================================
+
+      # Step 10: Upload Trivy SBOM for software supply chain auditing
       - name: Upload Trivy SBOM
         uses: actions/upload-artifact@v4
         if: always()
