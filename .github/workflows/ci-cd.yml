@@ -42,10 +42,45 @@ jobs:
         run: npm run build
 
       # Step 6: Run npm audit to check for known security vulnerabilities in dependencies
-      - name: Run npm audit
+      - name: npm Audit Security Check
         run: npm audit --audit-level=high || true
 
-      # Step 7: Upload the production build as a deployment artifact
+      # Step 7: Run Trivy filesystem vulnerability scan
+      - name: Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+        continue-on-error: true
+
+      # Step 8: Generate Trivy SBOM in CycloneDX format
+      - name: Trivy SBOM Generation
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'cyclonedx'
+          output: 'sbom-frontend.json'
+        continue-on-error: true
+
+      # Step 9: Run Gitleaks for secret scanning
+      - name: Gitleaks Secret Scanning
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      # Step 10: Upload Trivy SBOM
+      - name: Upload Trivy SBOM
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-sbom-frontend
+          path: sbom-frontend.json
+
+      # Step 11: Upload the production build as a deployment artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:

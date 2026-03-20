@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiEdit2, FiShare2, FiBarChart2, FiMessageSquare } from 'react-icons/fi';
+import { useParams, useNavigate } from 'react-router-dom';
+import { FiEdit2, FiShare2, FiMessageSquare } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { getSurveyById } from '../../services/surveyService';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -18,7 +18,7 @@ function SurveyDetail() {
   // Fetch survey details on mount
   useEffect(() => {
     fetchSurvey();
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSurvey = async () => {
     try {

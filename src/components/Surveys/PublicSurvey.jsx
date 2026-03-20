@@ -21,7 +21,7 @@ function PublicSurvey() {
   // Fetch survey by share link on mount
   useEffect(() => {
     fetchSurvey();
-  }, [shareLink]);
+  }, [shareLink]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSurvey = async () => {
     try {

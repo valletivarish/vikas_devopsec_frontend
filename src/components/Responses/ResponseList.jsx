@@ -18,7 +18,7 @@ function ResponseList() {
   // Fetch survey details and responses on mount
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchData = async () => {
     try {

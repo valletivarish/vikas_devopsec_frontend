@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { FiHome, FiFileText, FiBarChart2, FiTrendingUp, FiClipboard } from 'react-icons/fi';
+import { FiHome, FiFileText, FiTrendingUp, FiClipboard } from 'react-icons/fi';
 
 // Sidebar navigation component with links to all main sections
 // Uses NavLink for active state highlighting

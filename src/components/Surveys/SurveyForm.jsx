@@ -34,7 +34,7 @@ function SurveyForm() {
     if (isEditing) {
       fetchSurvey();
     }
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSurvey = async () => {
     try {

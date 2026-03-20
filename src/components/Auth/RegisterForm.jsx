@@ -31,7 +31,7 @@ function RegisterForm() {
       toast.success('Registration successful');
       navigate('/dashboard');
     } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed';
+      const message = error.response?.data?.message || 'Registration failed. Please try again.';
       // Display field-level errors from backend validation
       if (error.response?.data?.fieldErrors) {
         Object.values(error.response.data.fieldErrors).forEach((msg) => toast.error(msg));
