@@ -5,25 +5,22 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { loginSchema } from '../../utils/validators';
-import { FiLogIn } from 'react-icons/fi';
+import { FiLogIn, FiUser, FiShield, FiBarChart2 } from 'react-icons/fi';
 
-// Login form component with client-side validation matching backend rules
-// Authenticates user credentials and stores JWT token via AuthContext
 function LoginForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // Initialize react-hook-form with yup validation schema
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
-  // Handle form submission with error handling
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -38,6 +35,11 @@ function LoginForm() {
     }
   };
 
+  const fillCredentials = (username, password) => {
+    setValue('username', username);
+    setValue('password', password);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full">
@@ -48,7 +50,6 @@ function LoginForm() {
 
         <div className="card">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Username input with validation error display */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
               <input
@@ -60,7 +61,6 @@ function LoginForm() {
               {errors.username && <p className="error-text">{errors.username.message}</p>}
             </div>
 
-            {/* Password input with validation error display */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
@@ -77,6 +77,47 @@ function LoginForm() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-3 bg-white text-gray-500 uppercase tracking-wide">Quick Login</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => fillCredentials('demouser', 'Demo@1234')}
+                className="flex flex-col items-center gap-1.5 p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors disabled:opacity-50"
+              >
+                <FiUser className="w-5 h-5 text-blue-600" />
+                <span className="text-xs font-medium text-gray-700">Demo User</span>
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => fillCredentials('admin', 'Admin@1234')}
+                className="flex flex-col items-center gap-1.5 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors disabled:opacity-50"
+              >
+                <FiShield className="w-5 h-5 text-purple-600" />
+                <span className="text-xs font-medium text-gray-700">Admin</span>
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => fillCredentials('analyst', 'Analyst@1234')}
+                className="flex flex-col items-center gap-1.5 p-3 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors disabled:opacity-50"
+              >
+                <FiBarChart2 className="w-5 h-5 text-green-600" />
+                <span className="text-xs font-medium text-gray-700">Analyst</span>
+              </button>
+            </div>
+          </div>
 
           <p className="text-center text-sm text-gray-600 mt-4">
             Don&apos;t have an account?{' '}
